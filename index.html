@@ -9,14 +9,16 @@
       overflow: hidden;
       background: url("hinhnen.jpg") no-repeat center center fixed;
       background-size: cover;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
     }
 
+    /* Tiêu đề */
     .title-box {
       position: fixed;
-      top: 20px;
+      top: 10px;
       left: 50%;
       transform: translateX(-50%);
-      padding: 15px 40px;
+      padding: 10px 20px;
       border-radius: 15px;
       background: rgba(0, 0, 0, 0.5);
       z-index: 9999;
@@ -24,10 +26,9 @@
 
     .title-box h1 {
       margin: 0;
-      font-size: 46px;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      text-align: center;
+      font-size: 6vw; /* tự động co giãn theo màn hình */
       color: #ffeb3b;
+      text-align: center;
       text-shadow: 0 0 10px #ff5722, 0 0 20px #ff9800, 0 0 40px #ff5722;
       animation: neon 2s infinite alternate;
     }
@@ -43,58 +44,69 @@
       }
     }
 
+    /* Đèn lồng */
     .lantern {
       position: absolute;
-      cursor: pointer;
       animation: fall linear forwards;
+      pointer-events: auto;
     }
 
     @keyframes fall {
-      from {
-        transform: translateY(-150px) rotate(0deg);
-        opacity: 1;
-      }
-      to {
-        transform: translateY(110vh) rotate(360deg);
-        opacity: 0.8;
-      }
+      from { transform: translateY(-150px) rotate(0deg); opacity: 1; }
+      to { transform: translateY(110vh) rotate(360deg); opacity: 0.8; }
     }
 
     /* Nút bật nhạc */
     .music-btn {
       position: fixed;
-      bottom: 20px;
-      left: 20px;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
       padding: 12px 20px;
       background: rgba(255, 193, 7, 0.9);
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       box-shadow: 0 0 10px #ff9800;
       z-index: 10000;
     }
 
-    /* Popup câu chúc */
+    /* Popup lời chúc */
     .popup {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0);
       background: rgba(0, 0, 0, 0.8);
-      padding: 20px 30px;
+      padding: 15px 20px;
       border-radius: 15px;
       color: #fff;
-      font-size: 22px;
-      font-family: 'Comic Sans MS', cursive;
+      font-size: 18px;
       text-align: center;
+      max-width: 80%;
       box-shadow: 0 0 20px #ff9800;
       transition: transform 0.3s ease;
       z-index: 10000;
     }
     .popup.show {
       transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* Responsive cho mobile */
+    @media (max-width: 600px) {
+      .title-box h1 {
+        font-size: 8vw;
+      }
+      .music-btn {
+        font-size: 14px;
+        padding: 10px 15px;
+      }
+      .popup {
+        font-size: 16px;
+        padding: 12px 15px;
+      }
     }
   </style>
 </head>
@@ -123,7 +135,7 @@
   let playing = false;
 
   const wishes = [
- "🌕 Chúc bạn Trung Thu vui vẻ và hạnh phúc!",
+   "🌕 Chúc bạn Trung Thu vui vẻ và hạnh phúc!",
  "🎆 Chúc bạn và gia đình luôn sum vầy, bình an!", 
  "🌟 Trung Thu trăng sáng, chúc mọi ước mơ đều thành hiện thực!", 
  "🍀 Chúc bạn thật nhiều may mắn và niềm vui!", 
@@ -222,7 +234,7 @@
  "🍀 Trung Thu may mắn, chúc bạn thành công!", 
  "🌙 Đêm trăng bình yên, chúc bạn ngủ ngon!", 
  "🎶 Trung Thu vui nhộn, chúc bạn đầy tiếng cười!" 
-];
+  ];
 
   function toggleMusic() {
     if (playing) {
@@ -238,7 +250,7 @@
   function showPopup(message) {
     popup.textContent = message;
     popup.classList.add("show");
-    setTimeout(() => popup.classList.remove("show"), 3000);
+    setTimeout(() => popup.classList.remove("show"), 2500);
   }
 
   function createLantern() {
@@ -246,12 +258,11 @@
     lantern.src = lanternSrc;
     lantern.classList.add("lantern");
     lantern.style.left = Math.random() * window.innerWidth + "px";
-    const size = 80 + Math.random() * 100;
+    const size = 60 + Math.random() * 80;
     lantern.style.width = size + "px";
-    const duration = 5 + Math.random() * 7;
+    const duration = 6 + Math.random() * 6;
     lantern.style.animationDuration = duration + "s";
 
-    // Click vào đèn thì hiện popup
     lantern.addEventListener("click", () => {
       const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
       showPopup(randomWish);
@@ -261,12 +272,15 @@
     setTimeout(() => lantern.remove(), duration * 1000);
   }
 
-  // tạo nhiều đèn cùng lúc
+  // giảm số lượng đèn trên mobile
+  const isMobile = window.innerWidth < 600;
+  const lanternsPerBatch = isMobile ? 2 : 4;
+
   setInterval(() => {
-    for (let i = 0; i < 4; i++) { // số lượng đèn mỗi lần
+    for (let i = 0; i < lanternsPerBatch; i++) {
       createLantern();
     }
-  }, 500); // tốc độ gọi (0.5s)
+  }, 700);
 </script>
 
 </body>
