@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Trung Thu</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: url("hinhnen.jpg") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .title-box {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 40px;
+      border-radius: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+    }
+
+    .title-box h1 {
+      margin: 0;
+      font-size: 46px;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      text-align: center;
+      color: #ffeb3b;
+      text-shadow: 0 0 10px #ff5722, 0 0 20px #ff9800, 0 0 40px #ff5722;
+      animation: neon 2s infinite alternate;
+    }
+
+    @keyframes neon {
+      0% {
+        color: #ffeb3b;
+        text-shadow: 0 0 10px #ff5722, 0 0 20px #ff9800, 0 0 40px #ff5722;
+      }
+      100% {
+        color: #ff4081;
+        text-shadow: 0 0 10px #e91e63, 0 0 20px #f06292, 0 0 40px #e91e63;
+      }
+    }
+
+    .lantern {
+      position: absolute;
+      cursor: pointer;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      from {
+        transform: translateY(-150px) rotate(0deg);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0.8;
+      }
+    }
+
+    /* Nút bật nhạc */
+    .music-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 12px 20px;
+      background: rgba(255, 193, 7, 0.9);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0 0 10px #ff9800;
+      z-index: 10000;
+    }
+
+    /* Popup câu chúc */
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px 30px;
+      border-radius: 15px;
+      color: #fff;
+      font-size: 22px;
+      font-family: 'Comic Sans MS', cursive;
+      text-align: center;
+      box-shadow: 0 0 20px #ff9800;
+      transition: transform 0.3s ease;
+      z-index: 10000;
+    }
+    .popup.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="title-box">
+  <h1>🎉 Trung Thu Vui Vẻ 🎉</h1>
+</div>
+
+<!-- Audio nhạc -->
+<audio id="bg-music" loop>
+  <source src="nhac.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Nút bật/tắt nhạc -->
+<button class="music-btn" onclick="toggleMusic()">🔊 Bật nhạc</button>
+
+<!-- Popup -->
+<div id="popup" class="popup"></div>
+
+<script>
+  const lanternSrc = "dentrungthu.png"; 
+  const music = document.getElementById("bg-music");
+  const btn = document.querySelector(".music-btn");
+  const popup = document.getElementById("popup");
+  let playing = false;
+
+  const wishes = [
+ "🌕 Chúc bạn Trung Thu vui vẻ và hạnh phúc!",
+ "🎆 Chúc bạn và gia đình luôn sum vầy, bình an!", 
+ "🌟 Trung Thu trăng sáng, chúc mọi ước mơ đều thành hiện thực!", 
+ "🍀 Chúc bạn thật nhiều may mắn và niềm vui!", 
+ "❤️ Trung Thu tràn đầy yêu thương!", 
+ "🥮 Chúc bạn thưởng thức Trung Thu ngọt ngào như bánh dẻo!", 
+ "🏮 Chúc bạn đêm rằm lung linh và đầy tiếng cười!", 
+ "🌙 Mong bạn có Trung Thu an lành và ấm áp!", 
+ "🎉 Chúc một mùa trăng rằm rực rỡ và hạnh phúc!", 
+ "✨ Chúc bạn luôn tỏa sáng như ánh trăng Trung Thu!", 
+ "🌕 Trung Thu đoàn viên, chúc gia đình luôn ấm áp!", 
+ "🍵 Chúc bạn tận hưởng Trung Thu thư giãn, an nhiên!", 
+ "💫 Mong bạn có thật nhiều điều ước thành hiện thực đêm nay!", 
+ "🎑 Trung Thu trăng sáng, lòng người cũng sáng!", 
+ "🥰 Chúc bạn có những khoảnh khắc ngọt ngào bên người thân!", 
+ "🌸 Trung Thu đến, chúc bạn thêm nhiều niềm vui mới!", 
+ "🌟 Chúc cuộc sống của bạn luôn rực rỡ như đêm trăng!", 
+ "🍎 Chúc Trung Thu tràn đầy sức khỏe và bình an!", 
+ "🎶 Mong bạn có một Trung Thu vui nhộn và hạnh phúc!", 
+ "🏡 Trung Thu sum vầy, gia đình thêm gắn kết!", 
+ "🌕 Chúc bạn luôn nở nụ cười tươi như trăng rằm!", 
+ "🎁 Chúc bạn nhận được thật nhiều món quà bất ngờ!", 
+ "✨ Trung Thu mang đến cho bạn ánh sáng của yêu thương!", 
+ "🕯️ Chúc bạn ấm áp trong ánh đèn lồng lung linh!", 
+ "🍬 Mong Trung Thu của bạn ngọt ngào như kẹo dẻo!", 
+ "🌙 Chúc bạn có giấc mơ đẹp dưới ánh trăng vàng!", 
+ "💖 Trung Thu yêu thương, chúc bạn hạnh phúc ngập tràn!", 
+ "🍇 Chúc bạn dồi dào sức khỏe, niềm vui bền lâu!", 
+ "🏮 Trung Thu thắp sáng mọi niềm tin và hy vọng!", 
+ "🐰 Chúc bạn dễ thương như chú thỏ ngọc trên cung trăng!", 
+ "🎆 Trung Thu rực rỡ, chúc bạn hạnh phúc muôn màu!", 
+ "🌕 Trăng tròn, chúc bạn đủ đầy và sung túc!", 
+ "🥮 Chúc bạn Trung Thu no đủ và ngọt ngào!", 
+ "🌸 Trung Thu đến, chúc bạn thêm nhiều yêu thương!", 
+ "🎑 Chúc bạn tận hưởng Trung Thu trong bình yên!", 
+ "🍀 Chúc bạn gặp nhiều may mắn dưới ánh trăng vàng!", 
+ "🌟 Chúc bạn luôn thành công và rạng rỡ!", 
+ "🎉 Trung Thu an lành, chúc bạn niềm vui bất tận!", 
+ "❤️ Chúc tình yêu của bạn mãi đẹp như trăng rằm!", 
+ "🌙 Mong bạn tìm thấy sự an yên trong đêm trăng!", 
+ "🥮 Trung Thu hạnh phúc, chúc bạn đầy ắp niềm vui!", 
+ "🏡 Chúc gia đình bạn mãi ấm áp và đoàn viên!", 
+ "🌕 Trung Thu yêu thương, chúc bạn luôn vui vẻ!", 
+ "🎁 Mong bạn nhận được bất ngờ ngọt ngào trong đêm rằm!", 
+ "🌸 Chúc bạn Trung Thu lung linh như hoa nở!", 
+ "🐇 Chúc bạn dễ thương và hạnh phúc như thỏ ngọc!", 
+ "🍵 Chúc bạn an nhiên, nhẹ nhàng như ánh trăng!", 
+ "✨ Trung Thu rực rỡ, chúc bạn luôn may mắn!", 
+ "🎶 Chúc bạn có đêm trăng đầy nhạc và niềm vui!", 
+ "🌕 Mong mọi ước mơ của bạn đều thành hiện thực!", 
+ "🏮 Chúc bạn thắp sáng niềm tin cùng ánh đèn lồng!", 
+ "💖 Chúc bạn luôn hạnh phúc trong tình yêu thương!", 
+ "🥮 Chúc bạn đêm rằm ngọt ngào và ấm áp!", 
+ "🌟 Trung Thu mang đến cho bạn muôn vàn điều tốt đẹp!", 
+ "🎆 Chúc bạn đêm trăng rực rỡ sắc màu!", 
+ "🌙 Chúc bạn giấc ngủ ngon dưới ánh trăng vàng!", 
+ "🍀 Chúc bạn may mắn và bình an trong mùa trăng!", 
+ "🏡 Trung Thu gắn kết, chúc gia đình hạnh phúc!", 
+ "🐰 Mong bạn luôn đáng yêu như chú thỏ ngọc!", 
+ "🎉 Chúc bạn có Trung Thu thật trọn vẹn!", 
+ "🌕 Trung Thu an lành, chúc bạn sum vầy vui vẻ!", 
+ "🥮 Mong bạn luôn đủ đầy, ấm áp như trăng rằm!", 
+ "✨ Chúc bạn tỏa sáng giữa cuộc đời như ánh trăng!", 
+ "🎶 Chúc bạn có đêm trăng rộn ràng tiếng cười!", 
+ "🌸 Trung Thu dịu dàng, chúc bạn niềm vui ngập tràn!", 
+ "🍬 Chúc bạn Trung Thu ngọt ngào và đáng nhớ!", 
+ "🏮 Thắp sáng ước mơ cùng đèn lồng Trung Thu!", 
+ "🌟 Chúc bạn mãi rực rỡ và thành công!", 
+ "🌙 Đêm trăng an yên, chúc bạn ngủ ngon!", 
+ "💖 Chúc bạn nhận được muôn vàn yêu thương!", 
+ "🎁 Trung Thu vui vẻ, chúc bạn thật nhiều quà!", 
+ "🌕 Mong bạn có những ký ức đẹp đêm nay!", 
+ "🥮 Chúc bạn tận hưởng hương vị ngọt ngào!", 
+ "🏡 Chúc bạn và gia đình luôn hạnh phúc!", 
+ "🎆 Đêm rằm lung linh, chúc bạn an vui!", 
+ "🌸 Trung Thu như hoa, chúc bạn tươi tắn!", 
+ "🍀 Chúc bạn luôn gặp may mắn trong đời!", 
+ "🐇 Trung Thu dễ thương, chúc bạn hạnh phúc!", 
+ "✨ Chúc bạn có ánh sáng soi lối thành công!", 
+ "🎶 Chúc bạn đêm rằm tràn ngập tiếng hát!", 
+ "🌕 Trung Thu viên mãn, chúc bạn vui vẻ!", 
+ "🥮 Ngọt ngào bánh dẻo, ngập tràn hạnh phúc!", 
+ "❤️ Chúc bạn luôn yêu thương và được yêu thương!", 
+ "🎑 Đêm rằm an lành, chúc bạn thật nhiều niềm vui!", 
+ "🌙 Chúc bạn ấm áp dưới ánh trăng vàng!", 
+ "🏮 Trung Thu lung linh, chúc bạn thêm may mắn!", 
+ "🍬 Chúc bạn có đêm rằm ngọt ngào!", 
+ "🎉 Chúc bạn thật nhiều tiếng cười!", 
+ "🌕 Trung Thu sum vầy, chúc bạn đủ đầy!", 
+ "💖 Chúc bạn luôn hạnh phúc ngập tràn!", 
+ "🐰 Mong bạn luôn tươi vui và đáng yêu!", 
+ "🌸 Chúc bạn rạng rỡ như đóa hoa đêm trăng!", 
+ "🥮 Chúc bạn tận hưởng Trung Thu trọn vẹn!", 
+ "🏡 Chúc gia đình bạn hạnh phúc, đoàn viên!", 
+ "🎆 Trung Thu rực rỡ, chúc bạn an vui!", 
+ "🌟 Chúc bạn mãi rực sáng trên hành trình đời!", 
+ "🍀 Trung Thu may mắn, chúc bạn thành công!", 
+ "🌙 Đêm trăng bình yên, chúc bạn ngủ ngon!", 
+ "🎶 Trung Thu vui nhộn, chúc bạn đầy tiếng cười!" 
+];
+
+  function toggleMusic() {
+    if (playing) {
+      music.pause();
+      btn.textContent = "🔊 Bật nhạc";
+    } else {
+      music.play();
+      btn.textContent = "🔇 Tắt nhạc";
+    }
+    playing = !playing;
+  }
+
+  function showPopup(message) {
+    popup.textContent = message;
+    popup.classList.add("show");
+    setTimeout(() => popup.classList.remove("show"), 3000);
+  }
+
+  function createLantern() {
+    const lantern = document.createElement("img");
+    lantern.src = lanternSrc;
+    lantern.classList.add("lantern");
+    lantern.style.left = Math.random() * window.innerWidth + "px";
+    const size = 80 + Math.random() * 100;
+    lantern.style.width = size + "px";
+    const duration = 5 + Math.random() * 7;
+    lantern.style.animationDuration = duration + "s";
+
+    // Click vào đèn thì hiện popup
+    lantern.addEventListener("click", () => {
+      const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
+      showPopup(randomWish);
+    });
+
+    document.body.appendChild(lantern);
+    setTimeout(() => lantern.remove(), duration * 1000);
+  }
+
+  // tạo nhiều đèn cùng lúc
+  setInterval(() => {
+    for (let i = 0; i < 4; i++) { // số lượng đèn mỗi lần
+      createLantern();
+    }
+  }, 500); // tốc độ gọi (0.5s)
+</script>
+
+</body>
+</html>
